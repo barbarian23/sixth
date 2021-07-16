@@ -2,14 +2,11 @@ import socketServer from "../../service/socket/socket.server.service";
 // import csvService from "../../service/csv/csv.server.service";
 import {
     SOCKET_LOGIN,
-    SOCKET_OTP,
     SOCKET_WORKING_START_CRAWL_DATA,
     SOCKET_CRAWLED_DONE
 } from "../../../common/constants/common.constants";
 import doLogin from "../work/login.controller";
-import doOTPChecking from "../work/otp.controller";
 import doGetInfomation from "../work/home.controller";
-import { forEach } from "lodash";
 
 const puppeteer = require('puppeteer');
 //C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
@@ -59,9 +56,6 @@ const workingController = async function (server) {
             //login
             receive.on(SOCKET_LOGIN, login);
 
-            //otp
-            receive.on(SOCKET_OTP, doOTP);
-
             //tra cứu số
             receive.on(SOCKET_WORKING_START_CRAWL_DATA, doGetInfor);
         });
@@ -79,16 +73,6 @@ const login = async function (data) {
         doLogin(data.username, data.password, socket, driver, null); //driver 2 null
     } catch (e) {
         console.log("login error ", e);
-    }
-}
-
-//otp
-const doOTP = function (data) {
-    try {
-        console.log("Xac thuc voi OTP : ", data.otp);
-        doOTPChecking(data.otp, socket, driver);
-    } catch (e) {
-        console.log("doOTP error ", e);
     }
 }
 

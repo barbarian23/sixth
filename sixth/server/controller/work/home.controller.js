@@ -1,5 +1,5 @@
 import { HOME_URL } from "../../constants/work/work.constants";
-import { SOCKET_WORKING_CRAWLED_ITEM_DATA, SOCKET_CRAWLED_DONE } from "../../../common/constants/common.constants";
+import { SOCKET_WORKING_CRAWLED_ITEM_DATA } from "../../../common/constants/common.constants";
 import { getListTdInformation, getTdInformation } from "../../service/util/utils.server";
 const DEFAULT_DELAY = 2000;
 
@@ -73,10 +73,6 @@ async function doGetInfomation(line, numberPhone, index, month, worksheet, socke
             // clearInterval(itemPhone.interval);
             line++;
         }
-        //đưa đoạn gửi tín hiệu thành công ra khỏi if else
-        // if (index == length) {
-        //     socket.send(SOCKET_CRAWLED_DONE, { data: 2 });
-        // }
         return line;
     } catch (e) {
         console.log("doGetInfomation error ", e);

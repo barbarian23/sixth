@@ -10,11 +10,6 @@ const initialState = {
     loginError: "",
 };
 
-const mapKey = new Map([
-    ["1", () => { }],
-    ["2", () => { }]
-]);
-
 export default function loginReducer(state = initialState, action) {
     // console.log("initialState " + JSON.stringify(state));
     // console.log("[loginReducers " + action.type + "]", action.value);
@@ -42,5 +37,4 @@ export default function loginReducer(state = initialState, action) {
                 ...state
             }
     }
-    // return Object.assign({}, state, { [action.type]: action.value });
 }

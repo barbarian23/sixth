@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import '../../assets/css/home/home.css';
 import { TR_TYPE_TIME, TR_TYPE_SETUP } from "../../constants/home/home.constant";
-import { GET_LENGHT_LIST, GET_NUMBER_INFORMATION, SEND_NUMBER_TOSERVER, START_CRAWL_DATA } from "../../action/home/home.action";
+import { GET_LENGHT_LIST, START_CRAWL_DATA } from "../../action/home/home.action";
 import { readFileExcel, createFileExcel } from "../../service/excel/excel.client.service";
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -15,18 +15,6 @@ export default function Home() {
     let phoneNumberChecking = useSelector(state => state.home.phoneNumberChecking);
     let sumIndex = useSelector(state => state.home.sumIndex);
     let isCrawlDone = useSelector(state => state.home.isCrawlDone);
-
-    // let listPhone = useSelector(state => state.home.listPhone);
-
-    // thay doi % hoan thien crawl 
-    // useEffect(() => {
-    //     console.log("current list phone", listPhone);
-    //     if (listPhone.length === 0) {
-    //         dispatch({ type: GET_LIST_PHONE, data: null });
-    //     }
-    //     // khoi tao interval - duy nhat 1 lan
-    //     dispatch({ type: SET_INTERVAL_PHONE });
-    // }, []);
 
     useEffect(() => {
         setIsTracking(!isCrawlDone);
@@ -44,7 +32,6 @@ export default function Home() {
                 //Bỏ qua dòng đầu vì là tiêu đề
                 if (index > 0) {
                     // console.log("data in file excel", item);
-                    // dispatch({ type: SEND_NUMBER_TOSERVER, data: { phone: item[0], index: item[1] } });
                     let itemPhone = {
                         index: index,
                         phone: item[0]
@@ -65,10 +52,6 @@ export default function Home() {
 
     let onInputTime = (e) => {
         setMTime(e.target.value);
-    }
-
-    let downloadFile = (e) => {
-        createFileExcel(sampleData);
     }
 
     let setUpTime = () => {

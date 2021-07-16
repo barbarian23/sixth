@@ -1,4 +1,4 @@
-import { LOGIN_URL, OTP_URL } from "../../constants/work/work.constants";
+import { HOME_URL, LOGIN_URL } from "../../constants/work/work.constants";
 import { SOCKET_SOMETHING_ERROR, SOCKET_LOGIN_INCORRECT, SOCKET_LOGIN_STATUS } from "../../../common/constants/common.constants";
 
 const DEFAULT_DELAY = 2000;
@@ -20,7 +20,7 @@ async function doLogin(username, password, socket, driver, driver2) {
         await driver.goto(LOGIN_URL);
 
         // wait to complete
-        // await driver.waitForFunction('document.readyState === "complete"'); // need open comment
+        await driver.waitForFunction('document.readyState === "complete"'); // need open comment
 
         // select to username input & send username
         // let selector = "body #ctl01 .page .main .accountInfo #MainContent_LoginUser_UserName"; // need open comment
@@ -34,13 +34,14 @@ async function doLogin(username, password, socket, driver, driver2) {
 
         // select to button login & click button
         // selector = "body #ctl01 .page .main .accountInfo #MainContent_LoginUser_LoginButton";// need open comment
-        selector = "#fm1 > section > button";
+        selector = "#btnLogin";
         await Promise.all([driver.click(selector)]);
 
         await timer(2000);
 
         //lấy ra một DOM - tương đương hàm document.querySelector()
-        let dataFromLoginSummarySpan = await driver.$$eval("body #ctl01 .page .main .failureNotification", spanData => spanData.map((span) => {
+        selector = ""; // lay ra DOM khi login loi
+        let dataFromLoginSummarySpan = await driver.$$eval(selector, spanData => spanData.map((span) => {
             return span.innerHTML;
         }));
 
@@ -49,16 +50,16 @@ async function doLogin(username, password, socket, driver, driver2) {
             return;
         }
 
-       //focus vào trnag đang đăng nhập
+        //focus vào trnag đang đăng nhập
         await driver.bringToFront();
 
-         //đi tới trang thông tin số
-        // await driver.goto(OTP_URL);
+        //đi tới trang thông tin số
+        await driver.goto(HOME_URL);
         // wait to complete
 
-        await driver.evaluate("setInterval(()=>{document.querySelector('#passOTP')},500)");
+        // await driver.evaluate("setInterval(()=>{document.querySelector('#passOTP')},500)");
 
-        await driver.waitForFunction('document.querySelector("#passOTP") != null');
+        // await driver.waitForFunction('document.querySelector("#passOTP") != null');
 
         //await driver2.goto(OTP_URL);
 
