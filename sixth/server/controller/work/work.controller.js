@@ -11,7 +11,7 @@ import doGetInfomation from "../work/home.controller";
 const puppeteer = require('puppeteer');
 //C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
 //C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
-let exPath = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
+let exPath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 var driver, browser;
 
 //puppeteer

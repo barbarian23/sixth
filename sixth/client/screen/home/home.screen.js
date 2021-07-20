@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import '../../assets/css/home/home.css';
 import { TR_TYPE_TIME, TR_TYPE_SETUP } from "../../constants/home/home.constant";
 import { GET_LENGHT_LIST, START_CRAWL_DATA } from "../../action/home/home.action";
-import { readFileExcel, createFileExcel } from "../../service/excel/excel.client.service";
+import { readFileExcel } from "../../service/excel/excel.client.service";
 import { useSelector, useDispatch } from 'react-redux';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 
 export default function Home() {
     const [mTime, setMTime] = useState(0);
@@ -62,6 +64,11 @@ export default function Home() {
         console.log("sum ", sum);
         return ((index / sum) * 100).toFixed(2);
     }
+
+    const options = [
+        'one', 'two', 'three'
+    ];
+    const defaultOption = options[0];
     return (
         <div className="crawl-login" id="div_craw">
             <div style={{
@@ -69,23 +76,25 @@ export default function Home() {
                 top: "20px",
                 fontSize: "36px",
                 fontWeight: "600"
-            }}>CAS VNPT TRA CỨU THÔNG TIN</div>
+            }}>TRA CỨU SỐ ĐIỆN THOẠI</div>
             {
                 !isTracking ?
                     <div>
                         <div className="crawl-login">
                             <div className="input-add-div">
+                                <h3 className="input-title">Chọn đầu số</h3>
+                                <Dropdown options={options} onChange={this._onSelect} value={defaultOption} placeholder="Select an option" />;
                                 <input className="input-add" type="number" min="1" max="60" defaultValue="1" placeholder={TR_TYPE_TIME} onChange={onInputTime} />
-                                <input className="input-add-button" type="button" value={TR_TYPE_SETUP} onClick={setUpTime} />
+                                {/* <input className="input-add-button" type="button" value={TR_TYPE_SETUP} onClick={setUpTime} /> */}
                             </div>
-                            <div id="crawl_login_file_input_up">
-                                {/* <img id="img_file_input" src='../assets/images/file.png' /> */}
+                            <input className="input-add-button" type="button" value={TR_TYPE_SETUP} onClick={setUpTime} />
+                            {/* <div id="crawl_login_file_input_up">
                                 <label htmlFor="xlsx">Bấm vào đây để chọn tệp(excel)</label>
                                 <input type="file"
                                     id="xlsx" name="xlsx"
                                     accept="xlsx" onChange={readFile} />
                                 <span id="span_file_input_error"></span>
-                            </div>
+                            </div> */}
                         </div>
                         {
                             isCrawlDone && onBoarding ?
@@ -126,7 +135,7 @@ export default function Home() {
                                 <text>Đang tra cứu tệp <span style={{ color: "green" }}>{nameFile}</span></text>
                             </div>
                             <div className="tracking-index-number-upper">
-                                <text style={{textAlign:"center"}}>Đang tra cứu tới số thứ {phoneNumberChecking.index}</text>
+                                <text style={{ textAlign: "center" }}>Đang tra cứu tới số thứ {phoneNumberChecking.index}</text>
                             </div>
                             <div className="tracking-index-number-bellow">
                                 <text>Hoàn thành {percentProcess(phoneNumberChecking.index, sumIndex)}%</text>

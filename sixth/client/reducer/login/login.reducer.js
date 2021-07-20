@@ -1,4 +1,4 @@
-import { OPEN_OTP_SCREEN, LOGIN_ERROR, LOGGINGIN } from '../../action/login/login.action';
+import { LOGIN_ERROR, LOGGINGIN, OPEN_HOME_SCREEN } from '../../action/login/login.action';
 
 const initialState = {
     logginin: false,
@@ -16,7 +16,7 @@ export default function loginReducer(state = initialState, action) {
 
     switch (action.type) {
 
-        case OPEN_OTP_SCREEN:
+        case OPEN_HOME_SCREEN:
             return {
                 ...state,
                 isLoginSuccess: true

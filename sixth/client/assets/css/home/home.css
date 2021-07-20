@@ -71,16 +71,19 @@ td{
     width: 50%!important;
     display: flex;
     flex-wrap: nowrap;
-    margin: 10px 0px 0px 0px;
+    justify-content: center;
 }
 
 .input-add{
     width: 75%!important;
     height: 45px!important;
     margin-right: 10px;
-    margin-bottom: 10px;
 }
-
+.input-title{
+    width: 50%!important;
+    height: 45px!important;
+    margin-right: 10px;
+}
 .input-add-button{
     width: 25%!important;
     height: 45px!important;
