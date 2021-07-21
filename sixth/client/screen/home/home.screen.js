@@ -5,13 +5,14 @@ import { GET_LENGHT_LIST, START_CRAWL_DATA } from "../../action/home/home.action
 import { readFileExcel } from "../../service/excel/excel.client.service";
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-dropdown';
-import 'react-dropdown/style.css';
+import '../../assets/css/home/styleDropDown.css';
 
 export default function Home() {
     const [mTime, setMTime] = useState(0);
     const [isTracking, setIsTracking] = useState(false);
     const [nameFile, setNameFile] = useState("");
     const [onBoarding, setOnBoarding] = useState(false);
+    const [mNumber, setMNumber] = useState(0);
     const dispatch = useDispatch();
     let listPhone = useSelector(state => state.home.listPhone);
     let phoneNumberChecking = useSelector(state => state.home.phoneNumberChecking);
@@ -60,13 +61,26 @@ export default function Home() {
         dispatch({ type: ADD_PHONE, data: { mTime: mTime } });
     }
 
+    let onInputNumber = (e) => {
+        setMNumber(e.value);
+    }
+
+    let startCrawlData = () => {
+        dispatch({
+            type: START_CRAWL_DATA,
+            data: {
+                mNumber: mNumber
+            }
+        })
+    }
+
     let percentProcess = (index, sum) => {
         console.log("sum ", sum);
         return ((index / sum) * 100).toFixed(2);
     }
 
     const options = [
-        'one', 'two', 'three'
+        "8481", "8482", "8483", "8485", "8486", "8487", "8488", "8489"
     ];
     const defaultOption = options[0];
     return (
@@ -83,11 +97,11 @@ export default function Home() {
                         <div className="crawl-login">
                             <div className="input-add-div">
                                 <h3 className="input-title">Chọn đầu số</h3>
-                                <Dropdown options={options} onChange={this._onSelect} value={defaultOption} placeholder="Select an option" />;
-                                <input className="input-add" type="number" min="1" max="60" defaultValue="1" placeholder={TR_TYPE_TIME} onChange={onInputTime} />
+                                <Dropdown options={options} value={defaultOption} placeholder="Select an option" onChange={onInputNumber} />
+                                {/* <input className="input-add" type="number" min="1" max="60" defaultValue="1" placeholder={TR_TYPE_TIME} onChange={onInputTime} /> */}
                                 {/* <input className="input-add-button" type="button" value={TR_TYPE_SETUP} onClick={setUpTime} /> */}
                             </div>
-                            <input className="input-add-button" type="button" value={TR_TYPE_SETUP} onClick={setUpTime} />
+                            <input className="start-crawl-button" type="button" value={TR_TYPE_SETUP} onClick={startCrawlData} />
                             {/* <div id="crawl_login_file_input_up">
                                 <label htmlFor="xlsx">Bấm vào đây để chọn tệp(excel)</label>
                                 <input type="file"

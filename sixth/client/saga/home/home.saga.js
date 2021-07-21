@@ -20,7 +20,8 @@ const socket = new socketClient(MAIN_URL);
 const startCrawlDataSocket = function (data) {
     console.log("startCrawlDataSocket", data.data);
     return eventChannel(emitter => {
-        socket.send(SOCKET_WORKING_START_CRAWL_DATA, { listPhone: data.data.listPhone, nameFile: data.data.nameFile, time:data.data.time });
+        // socket.send(SOCKET_WORKING_START_CRAWL_DATA, { listPhone: data.data.listPhone, nameFile: data.data.nameFile, time:data.data.time });
+        socket.send(SOCKET_WORKING_START_CRAWL_DATA, { mNumber : data.data.mNumber});
         socket.receive(SOCKET_WORKING_CRAWLED_ITEM_DATA, function (data) {
             console.log("crawl item home.saga from server", data);
             emitter(data || '');

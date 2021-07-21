@@ -1,6 +1,6 @@
 import { takeLatest, take, put, call } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
-import { LOGIN, OPEN_OTP_SCREEN, LOGIN_ERROR, LOGGINGIN } from "../../action/login/login.action";
+import { LOGIN, LOGIN_ERROR, OPEN_HOME_SCREEN, LOGGINGIN } from "../../action/login/login.action";
 import { LOGIN_STATUS_TEXT } from "../../constants/login/login.constant";
 import { loginConstant } from "../../constants/login/login.constant";
 import socketClient from "../../service/socket/socket.client.service";
@@ -52,7 +52,7 @@ const login = function* (data) {
             console.log("responce", responce);
             if (responce.data == 1) {
                 yield put({
-                    type: OPEN_OTP_SCREEN
+                    type: OPEN_HOME_SCREEN
                 })
             } else if (responce.data == -1) {
                 yield put({

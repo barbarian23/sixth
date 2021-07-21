@@ -84,12 +84,12 @@ td{
     height: 45px!important;
     margin-right: 10px;
 }
-.input-add-button{
+.start-crawl-button{
     width: 25%!important;
     height: 45px!important;
 }
 
-.input-add-button:active{
+.start-crawl-button:active{
     transform: translatey(10px);
 }
 
