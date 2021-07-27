@@ -95,20 +95,23 @@ const doGetInfor = async function (data) { // crawl data in table : data la mNum
             },
         });
 
-        let mSufNumber = await renderNumber();
+        // start 
+        let mSufNumber = await renderNumber([], false);
         while (true) {
-            let countResult = await doGetInfomation(line, mNumber, mSufNumber, ws, socket, driver, style);
+            let countResult = await doGetInfomation(line, data.mNumber, mSufNumber, ws, socket, driver, style);
             if (countResult <= 19) {
                 writeToExcel();
-                mSufNumber = renderNumber();
-            } else {
-                mSufNumber = renderNumber();
+                mSufNumber = renderNumber(mSufNumber,true);
+            } 
+            else {
+                mSufNumber = renderNumber(mSufNumber, false);
             }
+            
             if (mSufNumber === null) {
                 break;
             }
         }
-
+        // end
         await wb.write(fileName);
         socket.send(SOCKET_CRAWLED_DONE, { data: 2 });
         line = 2;
