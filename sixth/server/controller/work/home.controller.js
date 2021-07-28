@@ -77,61 +77,101 @@ function nextNewNumber(number) {
     return newNumber;
 }
 
+function convertArrayToNumber(arrayNumber) {
+    let newNumber = 0;
+    let count = arrayNumber.length - 1;
+    let index = 0;
+    while (count >= 0) {
+        newNumber += arrayNumber[index] * Math.pow(10, count);
+        count--;
+        index++;
+    }
+    return newNumber;
+}
+
 export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, socket, driver, style) {
     try {
-        console.log("mNumber ", mNumber);
-        // go to login url
+        // chuyển mSufNumber sang số 
+        mSufNumber = convertArrayToNumber(mSufNumber);
+        //
+        console.log("mNumber: ", mNumber, " and mSufNumber: ", mSufNumber);
+        // go to home url
         await driver.goto(HOME_URL);
 
-        let selector = "#txtSearch";
-        await driver.$eval(selector, (el, value) => el.value = value, numberPhone);
+        // Lập HĐ
+        let selector = "#myMenuID > table > tbody > tr > td:nth-child(2) > span.ThemeOfficeMainFolderText";
+        await Promise.all([driver.click(selector)]);
 
-        // select to password input & send password
-        selector = "#month";
-        await driver.$eval(selector, (el, value) => el.value = value, month);
+        // Khởi tạo thuê bao trả sau
+        selector = "#cmSubMenuID2 > table > tbody > tr:nth-child(40) > td.ThemeOfficeMenuItemText";
+        await Promise.all([driver.click(selector)]);
 
-        // select to button search & click button
-        selector = "#Div_Param > div:nth-child(2) > div:nth-child(3) > button"; // need to update
-        await Promise.all([driver.click(selector)]);//, driver.waitForNavigation({ waitUntil: 'load', timeout: 0 })]);
+        // Kho số
+        // Kho số/ Chọn Kho số
+        selector = "#cmdKhoSo";
+        await Promise.all([driver.click(selector)]);
 
+        // Kho số/ Chọn Kho trả sau viễn thông tin 
+        selector = ""; //>> need to update selector
+        await Promise.all([driver.click(selector)]);
+
+        // Số thuê bao - chọn ra đầu số thuê bao
+        // Chọn đầu số - Đặt đầu số mặc định là 8481
+        selector = "#prefix";
+        await driver.$eval(selector, (el, value) => el.value = value, mNumber);
+
+        // Chọn sufNumber input và điền sufNumber 
+        selector = ""; //>> need to update selector
+        await driver.$eval(selector, (el, value) => el.value = value, mSufNumber);
+
+        // Bấm nút tìm kiếm
+        selector = "#search";
+        await Promise.all([driver.click(selector)]);
         await timer(2000);
 
-        //lấy ra table result search - chỉ lấy phần row data
-        let resultHtml = await driver.$$eval("#tbody_td_207", spanData => spanData.map((span) => {
-            return span.innerHTML;
-        }));
-
-        console.log("dataFromTable is: ", resultHtml);
-
-        if (JSON.stringify(resultHtml) == JSON.stringify([""])) { //  table k co du lieu >> k them vao excel
-            // bo qua,k them du lieu vao excel
-            socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index: index + 1, phone: numberPhone });
-
+        // Lấy hết thông tin trong bảng
+        // tobe continue
+        // check có nút next hay không?
+        if (haveNext) {
+            // Return countResult = 20 >> return số nào > 19 đều được
+            return 999;
         } else {
-            //let listTdTag = getListTdInformation(resultHtml);
-            let listTdTag = getListTdInformation(resultHtml[0]);
-            console.log("index", index);
-            // crawl BTS_NAME
-            let btsName = getTdInformation(listTdTag[1]);
-            // crawl MATINH - important
-            let maTinh = getTdInformation(listTdTag[2]);
-            // crawl TOTAL_TKC - optional
-            let totalTKC = getTdInformation(listTdTag[3]);
-            // thêm data vao excel
-            writeToXcell(worksheet, line, 1, index, style); // STT
-            writeToXcell(worksheet, line, 2, numberPhone, style); // SDT
-            writeToXcell(worksheet, line, 3, btsName[0], style); // BTS_NAME
-            writeToXcell(worksheet, line, 4, maTinh[0], style); // MA_TINH
-            writeToXcell(worksheet, line, 5, totalTKC[0], style); // TOTAL_TKC
-            // gửi dữ liệu về client
-            // await socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index:index, phone: numberPhone, btsName: btsName, maTinh: maTinh, totalTKC: totalTKC });
-            socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index: index, phone: numberPhone });
-            // clearInterval(itemPhone.interval);
-            line++;
+            // lấy toàn bộ kết quả và ghi ra file
+            //lấy ra table result search - chỉ lấy phần row data
+            let resultHtml = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
+                return span.innerHTML;
+            }));
+
+            console.log("dataFromTable is: ", resultHtml);
+            // write sub header - exp: 84812
+            writeToXcell(worksheet, line, 1, mNumber.toString() + mSufNumber.toString(), style); // sub header
+            if (JSON.stringify(resultHtml) != JSON.stringify([""])) { //  table k co du lieu >> return line luôn, chỉ xét trường hợp có dữ liệu
+                // đếm số phần tử trong list
+                // foreach listResult và ghi từng row trên 1 line, sau đó tăng line
+                //let listTdTag = getListTdInformation(resultHtml);
+                let listTdTag = getListTdInformation(resultHtml[0]);
+                console.log("index", index);
+                // crawl BTS_NAME
+                let btsName = getTdInformation(listTdTag[1]);
+                // crawl MATINH - important
+                let maTinh = getTdInformation(listTdTag[2]);
+                // crawl TOTAL_TKC - optional
+                let totalTKC = getTdInformation(listTdTag[3]);
+                // thêm data vao excel
+                writeToXcell(worksheet, line, 1, index, style); // STT
+                writeToXcell(worksheet, line, 2, numberPhone, style); // SDT
+                writeToXcell(worksheet, line, 3, btsName[0], style); // BTS_NAME
+                writeToXcell(worksheet, line, 4, maTinh[0], style); // MA_TINH
+                writeToXcell(worksheet, line, 5, totalTKC[0], style); // TOTAL_TKC
+                // gửi dữ liệu về client
+                // await socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index:index, phone: numberPhone, btsName: btsName, maTinh: maTinh, totalTKC: totalTKC });
+                //socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index: index, phone: numberPhone });
+                // clearInterval(itemPhone.interval);
+                line++;
+            }
         }
         return line;
     } catch (e) {
         console.log("doGetInfomation error ", e);
     }
 }
-// export default doGetInfomation;

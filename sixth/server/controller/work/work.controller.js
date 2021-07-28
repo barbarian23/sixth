@@ -100,7 +100,6 @@ const doGetInfor = async function (data) { // crawl data in table : data la mNum
         while (true) {
             let countResult = await doGetInfomation(line, data.mNumber, mSufNumber, ws, socket, driver, style);
             if (countResult <= 19) {
-                writeToExcel();
                 mSufNumber = renderNumber(mSufNumber,true);
             } 
             else {
