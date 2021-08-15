@@ -107,13 +107,10 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
         await Promise.all([driver.click(selector)]);
 
         // Kho số
-        // Kho số/ Chọn Kho số
+        // Kho số/ Chọn Kho trả sau viễn thông tỉnh - value "3"
         selector = "#cmdKhoSo";
-        await Promise.all([driver.click(selector)]);
-
-        // Kho số/ Chọn Kho trả sau viễn thông tin 
-        selector = ""; //>> need to update selector
-        await Promise.all([driver.click(selector)]);
+        // await Promise.all([driver.click(selector)]); không cần click trước
+        await Promise.all([driver.select(selector, '3')]);
 
         // Số thuê bao - chọn ra đầu số thuê bao
         // Chọn đầu số - Đặt đầu số mặc định là 8481
@@ -129,47 +126,70 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
         await Promise.all([driver.click(selector)]);
         await timer(2000);
 
-        // Lấy hết thông tin trong bảng
-        // tobe continue
-        // check có nút next hay không?
-        if (haveNext) {
-            // Return countResult = 20 >> return số nào > 19 đều được
-            return 999;
-        } else {
-            // lấy toàn bộ kết quả và ghi ra file
-            //lấy ra table result search - chỉ lấy phần row data
-            let resultHtml = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
-                return span.innerHTML;
-            }));
+        // lấy toàn bộ kết quả và bắt đầu kiểm tra số row trong bảng
+        //lấy ra table result search - chỉ lấy phần row data
+        let resultHtml = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
+            return span.innerHTML;
+        }));
 
-            console.log("dataFromTable is: ", resultHtml);
-            // write sub header - exp: 84812
-            writeToXcell(worksheet, line, 1, mNumber.toString() + mSufNumber.toString(), style); // sub header
-            if (JSON.stringify(resultHtml) != JSON.stringify([""])) { //  table k co du lieu >> return line luôn, chỉ xét trường hợp có dữ liệu
-                // đếm số phần tử trong list
+        console.log("dataFromTable is: ", resultHtml);
+        // write sub header - exp: 84812
+        writeToXcell(worksheet, line, 1, mNumber.toString() + mSufNumber.toString(), style); // sub header
+        if (JSON.stringify(resultHtml) == JSON.stringify(["null"])) { //  table k co du lieu >> return line luôn, chỉ xét trường hợp có dữ liệu
+            line++;
+        } else {
+            // lần 1 - chưa click button next
+            // result = {
+            //   count: ,
+            //    firstRow:,
+            //    arrayRow:
+            //}
+            let result = getResultFromHtml(resultHtml);
+            if (result.count < 19) {
+                // ghi ra file result.arrayRow
                 // foreach listResult và ghi từng row trên 1 line, sau đó tăng line
                 //let listTdTag = getListTdInformation(resultHtml);
-                let listTdTag = getListTdInformation(resultHtml[0]);
-                console.log("index", index);
-                // crawl BTS_NAME
-                let btsName = getTdInformation(listTdTag[1]);
-                // crawl MATINH - important
-                let maTinh = getTdInformation(listTdTag[2]);
-                // crawl TOTAL_TKC - optional
-                let totalTKC = getTdInformation(listTdTag[3]);
-                // thêm data vao excel
-                writeToXcell(worksheet, line, 1, index, style); // STT
-                writeToXcell(worksheet, line, 2, numberPhone, style); // SDT
-                writeToXcell(worksheet, line, 3, btsName[0], style); // BTS_NAME
-                writeToXcell(worksheet, line, 4, maTinh[0], style); // MA_TINH
-                writeToXcell(worksheet, line, 5, totalTKC[0], style); // TOTAL_TKC
-                // gửi dữ liệu về client
-                // await socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index:index, phone: numberPhone, btsName: btsName, maTinh: maTinh, totalTKC: totalTKC });
-                //socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index: index, phone: numberPhone });
-                // clearInterval(itemPhone.interval);
-                line++;
+                result.arrayRow.forEach(element => {
+                    let listTdTag = getListTdInformation(resultHtml[0]);
+                    console.log("index", index);
+                    // crawl BTS_NAME
+                    let btsName = getTdInformation(listTdTag[1]);
+                    // crawl MATINH - important
+                    let maTinh = getTdInformation(listTdTag[2]);
+                    // crawl TOTAL_TKC - optional
+                    let totalTKC = getTdInformation(listTdTag[3]);
+                    // thêm data vao excel
+                    writeToXcell(worksheet, line, 1, index, style); // STT
+                    writeToXcell(worksheet, line, 2, numberPhone, style); // SDT
+                    writeToXcell(worksheet, line, 3, btsName[0], style); // BTS_NAME
+                    writeToXcell(worksheet, line, 4, maTinh[0], style); // MA_TINH
+                    writeToXcell(worksheet, line, 5, totalTKC[0], style); // TOTAL_TKC
+                    // gửi dữ liệu về client
+                    // await socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index:index, phone: numberPhone, btsName: btsName, maTinh: maTinh, totalTKC: totalTKC });
+                    //socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index: index, phone: numberPhone });
+                    // clearInterval(itemPhone.interval);
+                    line++;
+                });
+            } else {
+                // bấm next lần 1
+                await Promise.all([driver.click("#btnNext")]);
+                let resultHtmlNext = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
+                    return span.innerHTML;
+                }));
+                let resultNext = getResultFromHtml(resultHtmlNext);
+                //row đầu tiên giống nhau -> chỉ có 19 kết quả
+                if (result.firstRow === resultHtmlNext.firstRow) {
+                    // ghi ra file result.arrayRow
+                } else {
+                    // line++; return; de next so
+                    line++;
+                }
             }
+
+
+
         }
+
         return line;
     } catch (e) {
         console.log("doGetInfomation error ", e);
