@@ -1,60 +1,42 @@
-export const getListTdTag = paragraph => {
+export const getCountTr = paragraph => {
     try {
-        var regex = /[<][t][d][^>]+>[^<]+<\/td>/g;
-        return paragraph.match(regex);
+        var regex = /[<][T][R][^>]+/g;
+        return paragraph.match(regex).length;
     } catch (e) {
-        console.log("getListTdTag error", e);
-        return [""];
+        console.log("get count Tr error ", e);
     }
 }
 
-export const getListMiddleNumber = paragraph => {
+export const getListTr = paragraph => {
     try {
-        var regex = /([>]|[\s])[\d][^<]+</g;
+        var regex = /([<][T][R][^>]+)[\d]+([^R])+/g;
         return paragraph.match(regex);
     } catch (e) {
-        console.log("getListMiddleNumber error", e);
-        return [""];
+        console.log("get list tr ", e);
     }
 }
 
-export const getListNumberMoney = paragraph => {
+export const getListTd = paragraph => {
     try {
-        var regex = /[\d]+[^<]+/g;
+        // <TD width="5%" align=center>1</TD>
+        // <TD width="10%" align=center><INPUT onclick=chon_tb(84846715163,1) id=1 type=radio name=choice> </TD>
+        // <TD width="30%" align=center>84846715163</TD>
+        // <TD width="15%" align=center>0</TD>
+        // <TD width="15%" align=center>0</TD>
+        // <TD width="25%" align=center>Kho trả sau VTT và khách hàng chọn số</TD></TR>
+        var regex = /[<][T][D][^<]+/g;
         return paragraph.match(regex);
     } catch (e) {
-        console.log("getListNumberMoney error", e);
-        return [""];
-    }
-}
-
-export const verifyNumberPhone = paragraph => {
-    try {
-        var regex = /[^0][\d]+/g;
-        return paragraph.match(regex) + "";
-    } catch (e) {
-        console.log("verifyNumberPhone error", e);
-        return [""];
-    }
-}
-export const getListTdInformation = paragraph => {
-    try {
-        var regex = /[<][t][d][>][^<]+/g;
-        return paragraph.match(regex);
-    } catch (e) {
-        console.log("get list td tag information error ", e);
-        return [""];
+        console.log("get list td ", e);
     }
 }
 
 export const getTdInformation = paragraph => {
     try {
-        var regex = /[^<td>]+/g;
-        console.log("getTdInformation",paragraph);
-        console.log("getTdInformation match",paragraph.match(regex));
+        //<TD width="30%" align=center>84846715163
+        var regex = /[^>]+/g;
         return paragraph.match(regex);
     } catch (e) {
-        console.log()
+        console.log("get td information ", e);
     }
 }
-

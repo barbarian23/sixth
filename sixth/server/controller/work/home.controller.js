@@ -1,6 +1,6 @@
 import { HOME_URL } from "../../constants/work/work.constants";
 import { SOCKET_WORKING_CRAWLED_ITEM_DATA } from "../../../common/constants/common.constants";
-import { getListTdInformation, getTdInformation } from "../../service/util/utils.server";
+import { getListTd, getListTr, getTdInformation } from "../../service/util/utils.server";
 const DEFAULT_DELAY = 2000;
 
 /**
@@ -138,58 +138,69 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
         if (JSON.stringify(resultHtml) == JSON.stringify(["null"])) { //  table k co du lieu >> return line luôn, chỉ xét trường hợp có dữ liệu
             line++;
         } else {
-            // lần 1 - chưa click button next
-            // result = {
-            //   count: ,
-            //    firstRow:,
-            //    arrayRow:
-            //}
-            let result = getResultFromHtml(resultHtml);
-            if (result.count < 19) {
-                // ghi ra file result.arrayRow
-                // foreach listResult và ghi từng row trên 1 line, sau đó tăng line
-                //let listTdTag = getListTdInformation(resultHtml);
-                result.arrayRow.forEach(element => {
-                    let listTdTag = getListTdInformation(resultHtml[0]);
-                    console.log("index", index);
-                    // crawl BTS_NAME
-                    let btsName = getTdInformation(listTdTag[1]);
-                    // crawl MATINH - important
-                    let maTinh = getTdInformation(listTdTag[2]);
-                    // crawl TOTAL_TKC - optional
-                    let totalTKC = getTdInformation(listTdTag[3]);
-                    // thêm data vao excel
-                    writeToXcell(worksheet, line, 1, index, style); // STT
-                    writeToXcell(worksheet, line, 2, numberPhone, style); // SDT
-                    writeToXcell(worksheet, line, 3, btsName[0], style); // BTS_NAME
-                    writeToXcell(worksheet, line, 4, maTinh[0], style); // MA_TINH
-                    writeToXcell(worksheet, line, 5, totalTKC[0], style); // TOTAL_TKC
-                    // gửi dữ liệu về client
-                    // await socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index:index, phone: numberPhone, btsName: btsName, maTinh: maTinh, totalTKC: totalTKC });
-                    //socket.send(SOCKET_WORKING_CRAWLED_ITEM_DATA, { index: index, phone: numberPhone });
-                    // clearInterval(itemPhone.interval);
+            // Lan 1: chưa bấm next
+            let count = getCountTr(resultHtml);
+            if (count < 19) {
+                let listTr = getListTr(resultHtml);
+                listTr.forEach(element => {
+                    let listTd = getListTd(element);
+                    let col1 = getTdInformation(listTd[0]);
+                    let col2 = getTdInformation(listTd[1]);
+                    let col3 = getTdInformation(listTd[2]);
+                    let col4 = getTdInformation(listTd[3]);
+                    let col5 = getTdInformation(listTd[4]);
+
+                    writeToXcell(worksheet, line, 1, col1[1], style);
+                    writeToXcell(worksheet, line, 2, col2[1], style);
+                    writeToXcell(worksheet, line, 3, col3[1], style);
+                    writeToXcell(worksheet, line, 4, col4[1], style);
+                    writeToXcell(worksheet, line, 5, col5[1], style);
+
                     line++;
                 });
             } else {
+                // Lấy giá trị đầu tiên cuả lần 1
+                let listTr = getListTr(resultHtml);
+                let firstListTd = getListTd(listTr[0]);
+                let firstNumber = getTdInformation(firstListTd[2]);
+
                 // bấm next lần 1
                 await Promise.all([driver.click("#btnNext")]);
                 let resultHtmlNext = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
                     return span.innerHTML;
                 }));
-                let resultNext = getResultFromHtml(resultHtmlNext);
-                //row đầu tiên giống nhau -> chỉ có 19 kết quả
-                if (result.firstRow === resultHtmlNext.firstRow) {
-                    // ghi ra file result.arrayRow
+
+                // Lấy giá trị đầu tiên của lần 2
+                let listTrNext = getListTr(resultHtmlNext);
+                let firstListTdNext = getListTd(listTrNext[0]);
+                let firstNumberNext = getTdInformation(firstListTdNext[2]);
+
+                //Number đầu tiên giống nhau -> chỉ có 19 kết quả
+                if (firstNumber[1] === firstNumberNext[1]) {
+                    // ghi ra file giống trường hợp < 19 kết quả
+                    let listTr = getListTr(resultHtml);
+                    listTr.forEach(element => {
+                        let listTd = getListTd(element);
+                        let col1 = getTdInformation(listTd[0]);
+                        let col2 = getTdInformation(listTd[1]);
+                        let col3 = getTdInformation(listTd[2]);
+                        let col4 = getTdInformation(listTd[3]);
+                        let col5 = getTdInformation(listTd[4]);
+
+                        writeToXcell(worksheet, line, 1, col1[1], style);
+                        writeToXcell(worksheet, line, 2, col2[1], style);
+                        writeToXcell(worksheet, line, 3, col3[1], style);
+                        writeToXcell(worksheet, line, 4, col4[1], style);
+                        writeToXcell(worksheet, line, 5, col5[1], style);
+
+                        line++;
+                    });
                 } else {
                     // line++; return; de next so
                     line++;
                 }
             }
-
-
-
         }
-
         return line;
     } catch (e) {
         console.log("doGetInfomation error ", e);
