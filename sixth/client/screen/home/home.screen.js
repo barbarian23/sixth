@@ -80,7 +80,7 @@ export default function Home() {
     }
 
     const options = [
-        "8481", "8482", "8483", "8485", "8486", "8487", "8488", "8489"
+        "8481", "8482", "8483", "8484", "8485", "8488", "8491", "8494", "8439", "8478"
     ];
     const defaultOption = options[0];
     return (
@@ -149,7 +149,7 @@ export default function Home() {
                                 <text>Đang tra cứu tệp <span style={{ color: "green" }}>{nameFile}</span></text>
                             </div>
                             <div className="tracking-index-number-upper">
-                                <text style={{ textAlign: "center" }}>Đang tra cứu tới số thứ {phoneNumberChecking.index}</text>
+                                <text style={{ textAlign: "center" }}>Đang tra cứu số {phoneNumberChecking.index}</text>
                             </div>
                             <div className="tracking-index-number-bellow">
                                 <text>Hoàn thành {percentProcess(phoneNumberChecking.index, sumIndex)}%</text>

@@ -19,6 +19,6 @@ export const SOCKET_CRAWLED_DONE = "SOCKET_CRAWLED_DONE";
 export const SOCKET_GET_INFORMATION = "SOCKET_GET_INFORMATION";
 
 //chung
-export const PORT = 3000;
+export const PORT = 8144;
 export const MAIN_URL = "http://localhost:" + PORT;
 export const ECLECTRON_LOAD = "http://localhost:" + PORT;

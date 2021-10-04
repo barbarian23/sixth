@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>CAS VNPT TRA CỨU THÔNG TIN</title>
+  <title>CCBS TRA CỨU ĐẦU SỐ ĐIỆN THOẠI</title>
 
   <style>
     body {
@@ -52,14 +52,13 @@
 
   <script>
     window.$ = window.jQuery = require("./node_modules/jquery/dist/jquery.min.js");
-
     const { ipcRenderer } = require("electron"),
-      expressAppUrl = "http://localhost:3000",
+      expressAppUrl = "http://localhost:8144",
       //spawn = require("child_process").spawn,
-
+      
       app = require('electron').remote.app,
       node = require("child_process").fork(
-        `${app.getAppPath()}/fiffth/dist/index`, //sửa thành đường dẫn đã build
+        `${app.getAppPath()}/sixth/dist/index`, //sửa thành đường dẫn đã build
         [],
         {
           stdio: ["pipe", "pipe", "pipe", "ipc"]

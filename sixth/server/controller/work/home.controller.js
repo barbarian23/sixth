@@ -96,41 +96,48 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
         //
         console.log("mNumber: ", mNumber, " and mSufNumber: ", mSufNumber);
         // go to home url
-        await driver.goto(HOME_URL);
+        //await driver.goto(HOME_URL);
+        await driver.get(HOME_URL);
 
-        // Lập HĐ
-        let selector = "#myMenuID > table > tbody > tr > td:nth-child(2) > span.ThemeOfficeMainFolderText";
-        await Promise.all([driver.click(selector)]);
-
+        // Lập HĐ thuê bao trả sau
+        // let selector = "#myMenuID > table > tbody > tr > td:nth-child(2) > span.ThemeOfficeMainFolderText";
+        // await Promise.all([driver.click(selector)]);
+        //gọi hàm này 
         // Khởi tạo thuê bao trả sau
-        selector = "#cmSubMenuID2 > table > tbody > tr:nth-child(40) > td.ThemeOfficeMenuItemText";
-        await Promise.all([driver.click(selector)]);
+        // selector = "#cmSubMenuID2 > table > tbody > tr:nth-child(40) > td.ThemeOfficeMenuItemText";
+        // await Promise.all([driver.click(selector)]);
+        //await driver.executeScript('document.getElementById("cmdKhoSo").options[2].selected=true');
+        await driver.executeScript('cmItemMouseUp (this,43)');
 
         // Kho số
         // Kho số/ Chọn Kho trả sau viễn thông tỉnh - value "3"
-        selector = "#cmdKhoSo";
+        //selector = "#cmdKhoSo";
         // await Promise.all([driver.click(selector)]); không cần click trước
-        await Promise.all([driver.select(selector, '3')]);
+        await driver.executeScript('document.getElementById("cmdKhoSo").options[2].selected=true');
 
         // Số thuê bao - chọn ra đầu số thuê bao
         // Chọn đầu số - Đặt đầu số mặc định là 8481
         selector = "#prefix";
-        await driver.$eval(selector, (el, value) => el.value = value, mNumber);
+        //await driver.$eval(selector, (el, value) => el.value = value, mNumber);
+        await driver.executeScript('document.getElementById("cmdKhoSo").options['+mNumber+'].selected=true');
 
         // Chọn sufNumber input và điền sufNumber 
         selector = ""; //>> need to update selector
-        await driver.$eval(selector, (el, value) => el.value = value, mSufNumber);
+        //await driver.$eval(selector, (el, value) => el.value = value, mSufNumber);
+        await driver.findElement(By.css(selector)).sendKeys(mSufNumber);
 
         // Bấm nút tìm kiếm
         selector = "#search";
-        await Promise.all([driver.click(selector)]);
+        //await Promise.all([driver.click(selector)]);
+        await driver.findElement(By.css(selector)).click();
         await timer(2000);
 
         // lấy toàn bộ kết quả và bắt đầu kiểm tra số row trong bảng
         //lấy ra table result search - chỉ lấy phần row data
-        let resultHtml = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
-            return span.innerHTML;
-        }));
+        // let resultHtml = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
+        //     return span.innerHTML;
+        // }));
+        let resultHtml = await driver.executeScript('return document.querySelector("#dsthuebao").innerHTML');
 
         console.log("dataFromTable is: ", resultHtml);
         // write sub header - exp: 84812
@@ -165,11 +172,13 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
                 let firstNumber = getTdInformation(firstListTd[2]);
 
                 // bấm next lần 1
-                await Promise.all([driver.click("#btnNext")]);
-                let resultHtmlNext = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
-                    return span.innerHTML;
-                }));
-
+                //await Promise.all([driver.click("#btnNext")]);
+                await driver.findElement(By.css("#btnNext")).click();
+                // let resultHtmlNext = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
+                //     return span.innerHTML;
+                // }));
+                let resultHtmlNext = await driver.executeScript('return document.querySelector("#dsthuebao").innerHTML');
+                
                 // Lấy giá trị đầu tiên của lần 2
                 let listTrNext = getListTr(resultHtmlNext);
                 let firstListTdNext = getListTd(listTrNext[0]);

@@ -9,7 +9,12 @@ import doLogin from "../work/login.controller";
 import { renderNumber, doGetInfomation } from "../work/home.controller";
 
 
-const puppeteer = require('puppeteer');
+//const puppeteer = require('puppeteer');
+const webdriver = require('selenium-webdriver');
+const { Builder } = require('selenium-webdriver');
+const { ServiceBuilder } = require('selenium-webdriver/ie');
+const path = require('path');
+
 //C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
 //C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
 let exPath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
@@ -45,11 +50,50 @@ const preparePuppteer = function () {
     });
 }
 
+const prepareSelenium = function () {
+    return new Promise(async (res, rej) => {
+        try {
+            //chạy bằng ie trong máy
+            require('iedriver');
+
+            //option
+            let ieCapabilities = webdriver.Capabilities.ie();
+            ieCapabilities.set("ignoreProtectedModeSettings", true);
+            ieCapabilities.set("ignoreZoomSetting", true);
+            ieCapabilities.set("headless", true);
+
+            //work khi cần đường dẫn tới 1 driver
+            //const driverPath = path.join(__dirname, "geckodriver"); // or wherever you've your geckodriver
+            // const driverPath = "F:\\seleniumdriver\\ie\\IEDriverServer_Win32_.3.150.2\\IEDriverServer.exe";
+            // const serviceBuilder = new ServiceBuilder(driverPath);
+            // const browser = await new Builder()
+            //     .forBrowser('internet explorer')
+            //     .setIeService(serviceBuilder)
+            //     .build();
+            //===============================================================
+
+            //work fine không cần đưòng dẫn tới driver mà dùng trực tiếp ie trong máy
+            // require('iedriver');
+            let browser = new webdriver.Builder()
+                .forBrowser("internet explorer")
+                .withCapabilities(idCapabilities)
+                .build();
+
+            res(browser);
+        } catch (e) {
+            rej(e);
+        }
+    });
+}
+
+
 const workingController = async function (server) {
     try {
-        browser = await preparePuppteer();
-        driver = await browser.newPage();
-        driver.setViewport({ width: 2600, height: 3800 });
+        driver = await prepareSelenium();
+
+        //await driver.get("https://www.google.com");
+        //driver = await browser.newPage();
+        //driver.setViewport({ width: 2600, height: 3800 });
 
         //khoi tao socket 
         socket = socketServer(server);
@@ -100,12 +144,12 @@ const doGetInfor = async function (data) { // crawl data in table : data la mNum
         while (true) {
             let countResult = await doGetInfomation(line, data.mNumber, mSufNumber, ws, socket, driver, style);
             if (countResult <= 19) {
-                mSufNumber = renderNumber(mSufNumber,true);
-            } 
+                mSufNumber = renderNumber(mSufNumber, true);
+            }
             else {
                 mSufNumber = renderNumber(mSufNumber, false);
             }
-            
+
             if (mSufNumber === null) {
                 break;
             }
