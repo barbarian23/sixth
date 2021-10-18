@@ -23,19 +23,18 @@ async function doLogin(username, password, socket, driver, driver2) {
         await driver.get(LOGIN_URL);
 
         // wait to complete
-        a//wait driver.waitForFunction('document.readyState === "complete"'); // need open comment
+        //await driver.waitForFunction('document.readyState === "complete"'); // need open comment
         //await driver.executeScript('document.readyState === "complete"');
 
         // select to username input & send username
-        let selector = "body #ctl01 .page .main .accountInfo #MainContent_LoginUser_UserName"; // need open comment
-
-        //let selector = "#username";
+        //let selector = "body #ctl01 .page .main .accountInfo #MainContent_LoginUser_UserName"; // need open comment
+        let selector = "#username";
         //await driver.$eval(selector, (el, value) => el.value = value, username);
         await driver.findElement(By.css(selector)).sendKeys(username);
 
         // select to password input & send password
-         selector = "body #ctl01 .page .main .accountInfo #MainContent_LoginUser_Password";// need open comment
-        //selector = "#password";
+         //selector = "body #ctl01 .page .main .accountInfo #MainContent_LoginUser_Password";// need open comment
+        selector = "#passWord";
 
         //await driver.$eval(selector, (el, value) => el.value = value, password);
         await driver.findElement(By.css(selector)).sendKeys(password);
@@ -53,7 +52,7 @@ async function doLogin(username, password, socket, driver, driver2) {
         //     return span.innerHTML;
         // }));
         // lay ra DOM khi login loi  
-        let errLogin = await driver.executeScript('return document.querySelector("#inform").innerHTML');
+        let errLogin = await driver.executeScript('return document.getElementById("inform").innerHTML');
         // let dataFromLoginSummarySpan = await driver.executeScript(function () {
         //     return document.querySelector('#something').innerHTML;
         // });

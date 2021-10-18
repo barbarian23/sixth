@@ -119,10 +119,10 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
         // Chọn đầu số - Đặt đầu số mặc định là 8481
         selector = "#prefix";
         //await driver.$eval(selector, (el, value) => el.value = value, mNumber);
-        await driver.executeScript('document.getElementById("cmdKhoSo").options['+mNumber+'].selected=true');
+        await driver.executeScript('document.getElementById("prefix").options['+mNumber+'].selected=true');
 
         // Chọn sufNumber input và điền sufNumber 
-        selector = ""; //>> need to update selector
+        selector = "#msisdn"; //>> need to update selector
         //await driver.$eval(selector, (el, value) => el.value = value, mSufNumber);
         await driver.findElement(By.css(selector)).sendKeys(mSufNumber);
 
@@ -130,19 +130,29 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
         selector = "#search";
         //await Promise.all([driver.click(selector)]);
         await driver.findElement(By.css(selector)).click();
-        await timer(2000);
+
+        //đợi cho đến khi kết thúc
+        await timer(5000);
+
+        let checkEmpty = false;
 
         // lấy toàn bộ kết quả và bắt đầu kiểm tra số row trong bảng
         //lấy ra table result search - chỉ lấy phần row data
         // let resultHtml = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
         //     return span.innerHTML;
         // }));
-        let resultHtml = await driver.executeScript('return document.querySelector("#dsthuebao").innerHTML');
+        let resultHtml = await driver.executeScript('return document.getElementById("dsthuebao").innerHTML');
+
+        let listTrTemp = resultHtml.match(/<td>/g)
+
+        checkEmpty = listTrTemp == null ? false : listTrTemp.length == 0 ? false : true;
 
         console.log("dataFromTable is: ", resultHtml);
+        console.log("checkEmpty: ", checkEmpty);
         // write sub header - exp: 84812
+
         writeToXcell(worksheet, line, 1, mNumber.toString() + mSufNumber.toString(), style); // sub header
-        if (JSON.stringify(resultHtml) == JSON.stringify(["null"])) { //  table k co du lieu >> return line luôn, chỉ xét trường hợp có dữ liệu
+        if (JSON.stringify(resultHtml) == JSON.stringify(["null"]) || checkEmpty) { //  table k co du lieu >> return line luôn, chỉ xét trường hợp có dữ liệu
             line++;
         } else {
             // Lan 1: chưa bấm next
@@ -177,7 +187,7 @@ export async function doGetInfomation(line, mNumber, mSufNumber, worksheet, sock
                 // let resultHtmlNext = await driver.$$eval("#dsthuebao", spanData => spanData.map((span) => {
                 //     return span.innerHTML;
                 // }));
-                let resultHtmlNext = await driver.executeScript('return document.querySelector("#dsthuebao").innerHTML');
+                let resultHtmlNext = await driver.executeScript('return document.getElementById("dsthuebao").innerHTML');
                 
                 // Lấy giá trị đầu tiên của lần 2
                 let listTrNext = getListTr(resultHtmlNext);

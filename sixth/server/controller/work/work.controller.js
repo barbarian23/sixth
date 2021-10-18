@@ -63,21 +63,22 @@ const prepareSelenium = function () {
             ieCapabilities.set("headless", true);
 
             //work khi cần đường dẫn tới 1 driver
-            //const driverPath = path.join(__dirname, "geckodriver"); // or wherever you've your geckodriver
-            // const driverPath = "F:\\seleniumdriver\\ie\\IEDriverServer_Win32_.3.150.2\\IEDriverServer.exe";
-            // const serviceBuilder = new ServiceBuilder(driverPath);
-            // const browser = await new Builder()
-            //     .forBrowser('internet explorer')
-            //     .setIeService(serviceBuilder)
-            //     .build();
+            //const driverPath = path.join(__dirname, "seleniumdriver\\ie\\IEDriverServer.exe"); // or wherever you've your geckodriver
+            const driverPath = "./seleniumdriver/ie/IEDriverServer.exe";
+            console.log("driverPath",driverPath);
+            const serviceBuilder = new ServiceBuilder(driverPath);
+            const browser = await new Builder()
+                .forBrowser('internet explorer')
+                .setIeService(serviceBuilder)
+                .build();
             //===============================================================
 
             //work fine không cần đưòng dẫn tới driver mà dùng trực tiếp ie trong máy
             // require('iedriver');
-            let browser = new webdriver.Builder()
-                .forBrowser("internet explorer")
-                .withCapabilities(idCapabilities)
-                .build();
+            // let browser = new webdriver.Builder()
+            //     .forBrowser("internet explorer")
+            //     .withCapabilities(ieCapabilities)
+            //     .build();
 
             res(browser);
         } catch (e) {
